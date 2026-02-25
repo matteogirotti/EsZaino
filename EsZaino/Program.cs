@@ -3,36 +3,50 @@ namespace EsZaino
 {
     internal class Program
     {
-        public static int RiempiZaino(int capacita, int[] pesi, int nPasso, int[] risultato, int spazioOccupato, int[] risultatoOttimo, int spazioOccupatoOttimo)
+        const int capacitaMassima = 50;
+        static void Main(string[] args)
         {
-            capacita = 50;
-            pesi = new int[]{ 13, 27, 11, 7, 40};
-            nPasso = 0;
-            risultato = new int[] { 0, 0, 0, 0, 0};
-            spazioOccupato = 0;
-            risultatoOttimo = new int[] { 0 };
-            spazioOccupatoOttimo = 0;
-
-            foreach (int i in pesi)
-            {
-                if(spazioOccupato == 0)
-                {
-                    while (!(i >= capacita))
-                    {
-                        risultato[i] = pesi[i];
-                        nPasso++;
-                        spazioOccupato += pesi[i];
-                    }
-                }
-            }
-            return spazioOccupato;
+            int pesoOttimo = 0;
+            List<int> soluzioneOttima = new List<int>();
+            int[] valori = { 11, 13, 7, 21, 40 };
+            if (valori.Length < 0)
+                throw new Exception("non ci sono valori");
+            if (capacitaMassima <= 0)
+                throw new Exception("Capacità non valida!");
+            Zaino zaino = new Zaino(0, 0, new List<int>());
+            Nodo<Zaino> radice = new Nodo<Zaino>(zaino);
+            Naviga(radice, valori, ref pesoOttimo, ref soluzioneOttima);
+            Console.WriteLine($"Risultato ottimo: {pesoOttimo}");
+            Console.Write("Oggetti Inclusi : ");
+            foreach (int indice in soluzioneOttima)
+                Console.Write($"{valori[indice]} ");
         }
-        private static void Main(string[] args)
+
+        static void Naviga(Nodo<Zaino> nodo, int[] valori, ref int pesoOttimo, ref List<int> soluzioneOttima)
         {
-            int[] pesi = new int[] { 13, 27, 11, 7, 40 };
-            int[] risultato = new int[] { 0, 0, 0, 0, 0 };
-            int[] risultatoOttimo = new int[] { 0 };
-            RiempiZaino(50, pesi, 0, risultato, 0, risultatoOttimo, 0);
+            Zaino s = nodo.Dati;
+            if (s.IndiceUltimoOggetto >= valori.Length)     //finisco i valori
+            {
+                if (s.PesoAccumulato > pesoOttimo || (s.PesoAccumulato == pesoOttimo && s.OggettiPresi.Count < soluzioneOttima.Count))
+                {
+                    pesoOttimo = s.PesoAccumulato;
+                    soluzioneOttima = new List<int>(s.OggettiPresi);
+                }
+                return;
+            }
+            //Prendo l'oggetto
+            int pesoConNuovoOggetto = s.PesoAccumulato + valori[s.IndiceUltimoOggetto];
+            if (pesoConNuovoOggetto <= capacitaMassima)
+            {
+                List<int> nuovaLista = new List<int>(s.OggettiPresi);
+                nuovaLista.Add(s.IndiceUltimoOggetto);
+
+                nodo.Prendo = new Nodo<Zaino>(new Zaino(s.IndiceUltimoOggetto + 1, pesoConNuovoOggetto, nuovaLista));
+                Naviga(nodo.Prendo, valori, ref pesoOttimo, ref soluzioneOttima);
+            }
+            //Non prendo l'oggetto
+            nodo.NonPrendo = new Nodo<Zaino>(new Zaino(s.IndiceUltimoOggetto + 1, s.PesoAccumulato, new List<int>(s.OggettiPresi)));
+            Naviga(nodo.NonPrendo, valori, ref pesoOttimo, ref soluzioneOttima);
         }
     }
 }
