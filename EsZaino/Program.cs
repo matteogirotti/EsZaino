@@ -35,28 +35,28 @@ namespace EsZaino
 
         static void NavigaZaino(Nodo<Zaino> nodo, int[] valori, ref int pesoOttimo, ref List<int> soluzioneOttima)
         {
-            Zaino s = nodo.Dati;
+            Zaino z = nodo.Dati;
 
-            if (s.IndiceUltimoOggetto >= valori.Length)
+            if (z.IndiceUltimoOggetto >= valori.Length)
             {
-                if (s.PesoAccumulato > pesoOttimo || (s.PesoAccumulato == pesoOttimo && s.OggettiPresi.Count < soluzioneOttima.Count))
+                if (z.PesoAccumulato > pesoOttimo || (z.PesoAccumulato == pesoOttimo && z.OggettiPresi.Count < soluzioneOttima.Count))
                 {
-                    pesoOttimo = s.PesoAccumulato;
-                    soluzioneOttima = new List<int>(s.OggettiPresi);
+                    pesoOttimo = z.PesoAccumulato;
+                    soluzioneOttima = new List<int>(z.OggettiPresi);
                 }
                 return;
             }
-            int pesoConNuovoOggetto = s.PesoAccumulato + valori[s.IndiceUltimoOggetto];
+            int pesoConNuovoOggetto = z.PesoAccumulato + valori[z.IndiceUltimoOggetto];
 
             if (pesoConNuovoOggetto <= capacitaMassima)
             {
-                List<int> nuovaLista = new List<int>(s.OggettiPresi);
-                nuovaLista.Add(s.IndiceUltimoOggetto);
+                List<int> nuovaLista = new List<int>(z.OggettiPresi);
+                nuovaLista.Add(z.IndiceUltimoOggetto);
 
-                nodo.Prendo = new Nodo<Zaino>(new Zaino(s.IndiceUltimoOggetto + 1, pesoConNuovoOggetto, nuovaLista));
+                nodo.Prendo = new Nodo<Zaino>(new Zaino(z.IndiceUltimoOggetto + 1, pesoConNuovoOggetto, nuovaLista));
                 NavigaZaino(nodo.Prendo, valori, ref pesoOttimo, ref soluzioneOttima);
             }
-            nodo.NonPrendo = new Nodo<Zaino>(new Zaino(s.IndiceUltimoOggetto + 1, s.PesoAccumulato, new List<int>(s.OggettiPresi)));
+            nodo.NonPrendo = new Nodo<Zaino>(new Zaino(z.IndiceUltimoOggetto + 1, z.PesoAccumulato, new List<int>(z.OggettiPresi)));
             NavigaZaino(nodo.NonPrendo, valori, ref pesoOttimo, ref soluzioneOttima);
         }
     }
